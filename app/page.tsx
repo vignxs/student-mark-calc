@@ -143,7 +143,7 @@ export default function Page() {
         <div className="rounded-3xl border border-white/15 bg-white/5 p-5 shadow-[0_24px_80px_-40px_rgba(0,0,0,0.65)] backdrop-blur-lg dark:border-white/10 dark:bg-black/25 sm:p-7">
           <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-              <h1 className="text-balance text-lg font-semibold tracking-tight sm:text-xl">
+              <h1 className="text-balance text-lg font-semibold  tracking-tight sm:text-xl">
                 Student Marks Calculator
               </h1>
               <p className="mt-1 text-pretty text-xs text-foreground/70 dark:text-muted-foreground">
