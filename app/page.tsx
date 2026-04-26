@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { useTheme } from "next-themes"
+import { Moon, Sun } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -97,6 +99,10 @@ function newRow(partial?: Partial<Row>): Row {
 }
 
 export default function Page() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => setMounted(true), [])
+
   const [preset, setPreset] = React.useState<PresetId>("custom")
   const [maxPerSubject, setMaxPerSubject] = React.useState<"100" | "50">("100")
   const [allSubjects, setAllSubjects] = React.useState<string[]>(() => Array.from(new Set(DEFAULT_SUBJECTS)))
@@ -134,20 +140,44 @@ export default function Page() {
   return (
     <main className="min-h-svh px-4 py-10 sm:px-6">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="rounded-3xl border border-white/15 bg-white/5 p-5 shadow-[0_24px_80px_-40px_rgba(0,0,0,0.65)] backdrop-blur-xl dark:border-white/10 dark:bg-black/25 sm:p-7">
+        <div className="rounded-3xl border border-white/15 bg-white/5 p-5 shadow-[0_24px_80px_-40px_rgba(0,0,0,0.65)] backdrop-blur-lg dark:border-white/10 dark:bg-black/25 sm:p-7">
           <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
               <h1 className="text-balance text-lg font-semibold tracking-tight sm:text-xl">
                 Student Marks Calculator
               </h1>
-              <p className="mt-1 text-pretty text-xs text-muted-foreground">
+              <p className="mt-1 text-pretty text-xs text-foreground/70 dark:text-muted-foreground">
                 Enter marks → get total, average, CGPA, and grade. (Press <kbd>d</kbd> to toggle theme.)
               </p>
             </div>
 
             <div className="flex flex-col gap-2 sm:items-end">
+              <div className="flex items-center justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                  className="h-9 px-3"
+                  aria-label="Toggle theme"
+                  title="Toggle theme"
+                  disabled={!mounted}
+                >
+                  {mounted && resolvedTheme === "dark" ? (
+                    <>
+                      <Sun className="mr-2 size-4" />
+                      Light
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="mr-2 size-4" />
+                      Dark
+                    </>
+                  )}
+                </Button>
+              </div>
+
               <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground">Class</label>
+                <label className="text-xs text-foreground/70 dark:text-muted-foreground">Class</label>
                 <select
                   value={preset}
                   onChange={(e) => {
@@ -168,7 +198,7 @@ export default function Page() {
               </div>
 
               <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground">Max / subject</label>
+                <label className="text-xs text-foreground/70 dark:text-muted-foreground">Max / subject</label>
                 <select
                   value={maxPerSubject}
                   onChange={(e) => setMaxPerSubject(e.target.value as "100" | "50")}
@@ -182,7 +212,7 @@ export default function Page() {
           </header>
 
           <section className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-foreground/70 dark:text-muted-foreground">
               Add your own subject (example: <span className="font-mono">Tamil</span>)
             </div>
             <div className="flex w-full items-center gap-2 sm:w-auto">
@@ -208,7 +238,7 @@ export default function Page() {
           </section>
 
           <section className="mt-6 grid gap-3">
-            <div className="grid grid-cols-12 gap-2 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
+            <div className="grid grid-cols-12 gap-2 text-[11px] font-semibold tracking-widest text-foreground/70 dark:text-muted-foreground uppercase">
               <div className="col-span-8 sm:col-span-9">Subject</div>
               <div className="col-span-4 sm:col-span-3 text-right">Marks</div>
             </div>
@@ -312,7 +342,7 @@ export default function Page() {
                 </Button>
               </div>
 
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-foreground/70 dark:text-muted-foreground">
                 Subjects: <span className="font-mono">{rows.length}</span>
               </div>
             </div>
@@ -325,7 +355,7 @@ export default function Page() {
             <GlassStat label="Grade" value={grade} sub="overall" />
           </section>
 
-          <footer className="mt-6 flex items-center justify-between gap-3 text-[11px] text-muted-foreground">
+          <footer className="mt-6 flex items-center justify-between gap-3 text-[11px] text-foreground dark:text-foreground/70 dark:text-muted-foreground">
             <div className="min-w-0">
               Tip: marks are automatically clamped to{" "}
               <span className="font-mono">
@@ -333,7 +363,19 @@ export default function Page() {
               </span>
               .
             </div>
-            <div className="shrink-0 font-mono">{clamp01(pct / 100) * 100 === 0 ? "" : `${pct.toFixed(2)}%`}</div>
+            <div className="shrink-0 flex items-center gap-2">
+              <div className="font-mono tabular-nums">
+                {clamp01(pct / 100) * 100 === 0 ? "" : `${pct.toFixed(2)}%`}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-3 text-[11px]"
+                onClick={() => setRows((prev) => prev.map((r) => ({ ...r, marks: "" })))}
+              >
+                Clear marks
+              </Button>
+            </div>
           </footer>
         </div>
       </div>
@@ -352,13 +394,13 @@ function GlassStat({
 }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md dark:border-white/10 dark:bg-black/15">
-      <div className="text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
+      <div className="text-[11px] font-semibold tracking-widest text-foreground dark:text-foreground/70 dark:text-muted-foreground uppercase">
         {label}
       </div>
       <div className="mt-1 text-lg font-semibold tabular-nums tracking-tight">
         {value}
       </div>
-      <div className="mt-0.5 text-[11px] text-muted-foreground">{sub}</div>
+      <div className="mt-0.5 text-[11px] text-foreground dark:text-foreground/70 dark:text-muted-foreground">{sub}</div>
     </div>
   )
 }
