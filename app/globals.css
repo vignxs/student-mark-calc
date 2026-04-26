@@ -121,9 +121,35 @@
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent text-foreground;
     }
   html {
     @apply font-sans;
     }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100svh;
+  background-image: url("/bg.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  /* background:
+    radial-gradient(1200px 600px at 20% 10%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 62%), */
+    /* radial-gradient(900px 500px at 80% 20%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.42)); */
+  z-index: -1;
+  pointer-events: none;
 }
